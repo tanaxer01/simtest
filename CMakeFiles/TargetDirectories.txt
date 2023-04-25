@@ -1,3 +1,0 @@
-/home/proyecto/CMakeFiles/rebuild_cache.dir
-/home/proyecto/CMakeFiles/edit_cache.dir
-/home/proyecto/CMakeFiles/test_01.dir
