@@ -1,8 +1,3 @@
-/* Copyright (c) 2007-2023. The SimGrid Team. All rights reserved.          */
-
-/* This program is free software; you can redistribute it and/or modify it
- * under the terms of the license (GNU LGPL) which comes with this package. */
-
 #include "simgrid/s4u.hpp"
 #include <vector>
 
@@ -39,29 +34,32 @@ int main(int argc, char* argv[])
   double computation_amount = fafard->get_speed();
 
   // Create a small DAG: Two parents and a child
-  sg4::ExecPtr first_parent  = sg4::Exec::init();
-  sg4::ExecPtr second_parent = sg4::Exec::init();
-  sg4::ExecPtr child         = sg4::Exec::init();
-  first_parent->add_successor(child);
-  second_parent->add_successor(child);
+  sg4::ExecPtr A = sg4::Exec::init();
+  sg4::ExecPtr B = sg4::Exec::init();
+  sg4::ExecPtr C = sg4::Exec::init();
+
+  A->add_successor(B);
+  B->add_successor(C);
 
   // Set the parameters (the name is for logging purposes only)
   // + First parent ends after 1 second and the Second parent after 2 seconds.
-  first_parent->set_name("parent 1")->set_flops_amount(computation_amount);
-  second_parent->set_name("parent 2")->set_flops_amount(2 * computation_amount);
-  child->set_name("child")->set_flops_amount(computation_amount);
+  A->set_name("A")->set_flops_amount(computation_amount);
+  B->set_name("B")->set_flops_amount(5 * computation_amount);
+  C->set_name("C")->set_flops_amount(computation_amount);
 
   // Only the parents are scheduled so far
-  first_parent->set_host(fafard);
-  second_parent->set_host(fafard);
+  A->set_host(fafard);
+  B->set_host(fafard);
+  C->set_host(fafard);
 
   // Start all activities that can actually start.
-  first_parent->start();
-  second_parent->start();
-  child->start();
+  A->start();
+  B->start();
+  C->start();
 
-  while (child->get_state() != sg4::Activity::State::FINISHED) {
+  while (C->get_state() != sg4::Activity::State::FINISHED) {
     e.run();
+
     for (auto* a : vetoed) {
       auto* exec = static_cast<sg4::Exec*>(a);
 
