@@ -1,15 +1,19 @@
-FROM simgrid/unstable
+FROM ubuntu:20.04
 
-ARG DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # DEPENDENCIAS
 RUN apt update -y
 RUN apt install -y \
-    g++ python3 cmake libboost-dev libboost-context-dev  \
+    git g++ python3 cmake libboost-dev libboost-context-dev  \
     libboost-stacktrace-dev libevent-dev nlohmann-json3-dev \
     graphviz graphviz-dev
 
 # REBUILD SIMGRID
-RUN cd /source/simgrid.git && \
-    cmake -DCMAKE_INSTALL_PREFIX=/opt/simgrid . && \
-    make && make install
+RUN mkdir /source && git clone --depth=1 https://framagit.org/simgrid/simgrid.git /source/simgrid.git && \
+    cd /source/simgrid.git && cmake  \
+        -DCMAKE_INSTALL_PREFIX=/usr/ \
+        -Denable_documentation=OFF   \
+        -Denable_smpi=ON             \
+        -Denable_compile_optimizations=ON . &&\
+    make -j4 install
